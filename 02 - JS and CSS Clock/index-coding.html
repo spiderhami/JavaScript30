@@ -62,81 +62,46 @@
       background: black;
       position: absolute;
       top: 50%;
+      /* 添加部分 */
+      transform-origin: right;
     }
 
     /* 添加部分 */
     .hour-hand {
         width: 30%;
         left: 20%;
-        transform-origin: right;
-    }
-    .min-hand {
-        transform-origin: right;
+
     }
     .second-hand {
         height: 2px;
-        transform-origin: right;
     }
 
   </style>
 
   <script>
-      var hourCSS,
-          minCSS,
-          secCSS,
-          hour,
-          minute,
-          second;
+      var hourHand = document.querySelector(".hour-hand"),
+          minHand = document.querySelector(".min-hand"),
+          secHand = document.querySelector(".second-hand");
 
-      function findRule() {
-           var rules = document.styleSheets[0].cssRules,
-               i;
-           for (i = 0; i < rules.length; i++) {
-               switch(rules[i].selectorText) {
-                   case ".hour-hand":
-                       hourCSS = rules[i];
-                       break;
-                   case ".min-hand":
-                       minCSS = rules[i];
-                       break;
-                   case ".second-hand":
-                       secCSS = rules[i];
-                       break;
-               }
-           }
-      }
-
+      /* 时针、分针位置受分针、秒针的转动而“每时每刻”变化 */
       function mapTime() {
           var baseDeg = 90; // 原始时针位置到0点位置的旋转角度
-          if (second === 60) {
-              minute++;
-              second = second % 60;
-          }
-          if (minute === 60) {
-              hour++;
-              minute = minute % 60;
-          }
-          hour = hour % 12;
-          hourCSS.style.transform = `rotate(${hour * 30 + baseDeg}deg)`;
-          minCSS.style.transform = `rotate(${minute * 6 + baseDeg}deg)`;
-          secCSS.style.transform = `rotate(${second * 6 + baseDeg}deg)`;
-
-      }
-      function initialTime() {
           var t = new Date();
-          hour = t.getHours();
-          minute = t.getMinutes();
-          second = t.getSeconds();
-          mapTime();
+
+          var second = t.getSeconds();
+          var secondDeg = second / 60 * 360 + baseDeg;
+          secHand.style.transform = `rotate(${secondDeg}deg)`;
+          var minute = t.getMinutes();
+          var minuteDeg = minute / 60 * 360 + second / 60 * 6 + baseDeg;
+          minHand.style.transform = `rotate(${minuteDeg}deg)`;
+          var hour = t.getHours();
+          var hourDeg = hour / 12 * 360 + minute / 60 * 30 + baseDeg;
+          hourHand.style.transform = `rotate(${hourDeg}deg)`;
       }
 
       function loadProgram() {
-          findRule();
-          initialTime();
-          setInterval(function() {
-              second++;
-              mapTime();
-          }, 1000);
+          mapTime();
+          setInterval(mapTime, 1000);
       }
 
       document.addEventListener("DOMContentLoaded", loadProgram);
