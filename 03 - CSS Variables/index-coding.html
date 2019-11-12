@@ -21,7 +21,21 @@
   <img src="https://source.unsplash.com/7bwQXzbF6KE/800x500">
 
   <style>
+      :root {
+          --spacing: 10px;
+          --blur: 10px;
+          --base: #ffc600;
+      }
 
+      img {
+          padding: var(--spacing);
+          filter: blur(var(--blur));
+          background-color: var(--base);
+      }
+
+      .hl {
+          color: var(--base);
+      }
     /*
       misc styles, nothing to do with CSS variables
     */
@@ -48,36 +62,16 @@
       const space = document.querySelector('input#spacing');
       const blur = document.querySelector('input#blur');
       const color = document.querySelector('input#base');
-      const img = document.querySelector('img');
-      const div = document.createElement('span');
+      const root = document.documentElement;
 
-      function init() {
-          img.parentNode.insertBefore(div, img);
-          div.appendChild(img);
-
-          div.style.display = 'inline-block';
-          img.style.display = 'block';
-          updateSpace();
-          updateBlur();
-          updateBase();
+      function handler() {
+          const unit = this.dataset.sizing? this.dataset.sizing : '';
+          root.style.setProperty(`--${this.id}`, this.value + unit);
       }
 
-      function updateSpace() {
-          div.style.padding = `${space.value}${space.dataset.sizing}`;
-      }
-
-      function updateBlur() {
-          div.style.filter = `blur(${blur.value}${blur.dataset.sizing})`;
-      }
-
-      function updateBase() {
-          div.style.backgroundColor = color.value;
-      }
-
-      init();
-      space.addEventListener('input', updateSpace);
-      blur.addEventListener('input', updateBlur);
-      color.addEventListener('change', updateBase);
+      space.addEventListener('input', handler);
+      blur.addEventListener('input', handler);
+      color.addEventListener('change', handler);
 
   </script>
 
