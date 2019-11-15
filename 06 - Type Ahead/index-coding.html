@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+<script>
+    function handler() {
+        const search = this.value;
+        const regex = new RegExp(search, 'gi');
+        const display = database.filter(item => {
+            return regex.test(item.city) || regex.test(item.state);
+        });
+
+        let html = '';
+        for (let i = 0; i < display.length; i++) {
+            let cityHTML = display[i].city + ', ' + display[i].state;
+            // highlight匹配部分，配合css中的"text-transform: capitalize"让替换成小写的单词首字母回到大写
+            cityHTML = cityHTML.replace(regex, `<span class="hl">${search}</span>`);
+            html +=
+            `<li>
+                <span>${cityHTML}</span>
+                <span class="population">${display[i].population}</span>
+            </li>`;
+        }
+
+        ul.innerHTML = html;
+    }
+
+    const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+    const database = [];
+    fetch(endpoint)
+        .then(response => response.json())
+        .then(data => database.push(...data));
+
+    const ul = document.querySelector('ul');
+    const input = document.querySelector('input');
+    input.addEventListener('input', handler);
+</script>
+</body>
+</html>
