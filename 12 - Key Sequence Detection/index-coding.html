@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Key Detection</title>
+  <script type="text/javascript" src="https://www.cornify.com/js/cornify.js"></script>
+</head>
+<body>
+<script>
+    function handler(e) {
+        if (keys.length === code.length) {
+            keys.shift();
+        }
+        keys.push(e.key);
+        if (keys.join('') === code) {
+            cornify_add(); // 调用其他js文件中用以展示特效的函数
+        }
+    }
+
+    const code = 'surprise';
+    let keys = []; // 模拟队列
+    window.addEventListener('keyup', handler);
+
+</script>
+</body>
+</html>
