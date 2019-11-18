@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+<body>
+<canvas id="draw" width="800" height="800"></canvas>
+<script>
+    function draw(e) {
+        if (!startDraw) {
+            return;
+        }
+        context.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+        context.beginPath();
+        context.moveTo(lastX, lastY);
+        context.lineTo(e.x, e.y);
+        context.stroke();
+
+        [lastX, lastY] = [e.x, e.y];
+        hue++;
+        // Tricker than expected, lineWidth can't be set to lower than 1
+        if (context.lineWidth <= 1 || context.lineWidth >= 100) {
+            direction = !direction;
+        }
+        if (direction) {
+            context.lineWidth++;
+        } else {
+            context.lineWidth--;
+        }
+    }
+
+    function prepare(e) {
+        startDraw = true;
+        [lastX, lastY] = [e.x, e.y];
+    }
+
+    const drawing = document.getElementById('draw');
+    [drawing.width, drawing.height] = [window.innerWidth, window.innerHeight];
+    const context = drawing.getContext('2d');
+    context.lineWidth = 100;
+    context.lineJoin = 'round';
+    context.lineCap = 'round';
+    let hue = 0;
+    let direction = true; // flag to increase or decrease pen width
+    let [lastX, lastY] = [0, 0]; // last point coordinate
+    let startDraw = false;
+
+    window.addEventListener('mousedown', prepare);
+    window.addEventListener('mouseup', () => startDraw = false);
+    window.addEventListener('mousemove', draw);
+</script>
+
+<style>
+  html, body {
+    margin: 0;
+  }
+</style>
+
+</body>
+</html>
