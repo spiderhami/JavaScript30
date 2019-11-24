@@ -9,55 +9,50 @@ let timerID;
 function handleSubmit(e) {
     const val = input.value;
     this.reset();
-    
+
     e.preventDefault();
     if (/\D/.test(val)) {
         return;
     }
-    if (timerID) {
-        clearTimeout(timerID);
-    }
-    const seconds = parseFloat(val) * 60;
-    countdown(seconds);
-    backTime(seconds);
+
+    readyToCountdown(parseFloat(val) * 60);
 }
 
 function handleClick() {
-    const seconds = parseFloat(this.dataset.time);
-    if (timerID) {
-        clearTimeout(timerID);
-    }
-    countdown(seconds);
-    backTime(seconds);
+    readyToCountdown(parseFloat(this.dataset.time));
 }
 
-function countdown(set) {
-    const minute = Math.floor(set / 60);
-    let second = set % 60;
-    second = (second > 9) ? second : ('0' + second);
-    const time = minute + ':' + second;
-    //// title time is slightly slower than counting
-    counting.innerText = time;
-    title.innerText = time;
+function readyToCountdown(seconds) {
+    const laterTimeStamp = Date.now() + seconds * 1000;
+    
+    clearTimeout(timerID); // It's fine timerID undefined
+    countdown(seconds, laterTimeStamp);
+    displayBackTime(laterTimeStamp);
+}
 
-    set--;
-    if (set >= 0) {
-        timerID = setTimeout(function() {countdown(set);}, 1000);
+function countdown(secondsLeft, laterTimeStamp) {
+    if (secondsLeft >= 0) {
+        displayTimeLeft(secondsLeft);
+        timerID = setTimeout(() => {
+            secondsLeft = Math.round((laterTimeStamp - Date.now()) / 1000);
+            countdown(secondsLeft, laterTimeStamp);
+        }, 1000);
     }
 }
 
-function backTime(secondAdded) {
-    const now = new Date();
-    const [sec, min, hour] = [now.getSeconds(), now.getMinutes(), now.getHours()];
-    const minuteAdded = Math.floor((sec + secondAdded) / 60);
-    const hourAdded = Math.floor((min + minuteAdded) / 60);
-
-    const backHour = (hour + hourAdded) % 24;
-    let backMin = (min + minuteAdded) % 60;
-    backMin = (backMin > 9) ? backMin : ('0' + backMin);
-    const time = backHour + ':' + backMin;
-    comeback.innerText = 'Be Back At ' + time;
+function displayTimeLeft(secondsLeft) {
+    const mins = Math.floor(secondsLeft / 60);
+    const secs = secondsLeft % 60;
+    counting.innerText = `${mins}:${secs<10 ? '0' : ''}${secs}`;
+    title.innerText = counting.innerText;
 }
+
+function displayBackTime(laterTimeStamp) {
+    const time = new Date(laterTimeStamp);
+    const [hours, mins] = [time.getHours(), time.getMinutes()];
+    comeback.innerText = `Be Back At ${hours}:${(mins<10 ? '0' : '')}${mins}`;
+}
+
 
 form.addEventListener('submit', handleSubmit);
 quickEvents.forEach(e => e.addEventListener('click', handleClick));
